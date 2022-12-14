@@ -1,25 +1,12 @@
-# MySQL + Flask Boilerplate Project
+3 Personas
+- Buyer
+- Seller
+- Admin
 
-This repo contains a boilerplate setup for spinning up 2 docker containers: 
-1. A MySQL 8 container for obvious reasons
-1. A Python Flask container to implement a REST API
+Admins have the ability to ban sellers and buyers.
 
-## How to setup and start the containers
-**Important** - you need Docker Desktop installed
+A Buyer and Seller profile is created for each user of the platform, similar to how most online shopping platforms work. Each of these two profiles have their own UserInfo entry that stores their basic info.
 
-1. Clone this repository.  
-1. Create a file named `db_root_password.txt` in the `secrets/` folder and put inside of it the root password for MySQL. 
-1. Create a file named `db_password.txt` in the `secrets/` folder and put inside of it the password you want to use for the `webapp` user. 
-1. In a terminal or command prompt, navigate to the folder with the `docker-compose.yml` file.  
-1. Build the images with `docker compose build`
-1. Start the containers with `docker compose up`.  To run in detached mode, run `docker compose up -d`. 
+With their seller profile, users can list items for sale in a specific quantity for a specific price. In doing so, they add to the Products database table. 
 
-## For setting up a Conda Web-Dev environment:
-
-1. `conda create -n webdev python=3.9`
-1. `conda activate webdev`
-1. `pip install flask flask-mysql flask-restful cryptography flask-login`
-
-
-
-
+A Buyer can purchase one of these items by placing an order, creating a new entry in the orders table. If this order can be met, it then subtracts the quantity from the products table's entry corresponding to that order. To get order or sale history for a buyer or seller, we simply look through the order database and filter by the orders who's buyer or seller id equals that of the buyer/seller we are looking at.
