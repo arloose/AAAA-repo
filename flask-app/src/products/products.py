@@ -1,18 +1,18 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, session
 import json
 from src import db
 
 
 products = Blueprint('products', __name__)
 
-# Get all the products from the database
+# Get all the products from the database that have remaining stock
 @products.route('/products', methods=['GET'])
 def get_products():
     # get a cursor object from the database
     cursor = db.get_db().cursor()
 
     # use cursor to query the database for a list of products
-    cursor.execute('select productCode, productName, productVendor from products')
+    cursor.execute('SELECT ProductID, ProductName, SellerID, Quantity, unitPrice FROM Products WHERE Quantity > 0')
 
     # grab the column headers from the returned data
     column_headers = [x[0] for x in cursor.description]
@@ -31,19 +31,15 @@ def get_products():
 
     return jsonify(json_data)
 
-# get the top 5 products from the database
-@products.route('/top5products')
-def get_most_pop_products():
+@products.route('/types', methods=['GET'])
+def get_product_types():
+    # get a cursor object from the database
     cursor = db.get_db().cursor()
-    query = '''
-        SELECT p.productCode, productName, sum(quantityOrdered) as totalOrders
-        FROM products p JOIN orderdetails od on p.productCode = od.productCode
-        GROUP BY p.productCode, productName
-        ORDER BY totalOrders DESC
-        LIMIT 5;
-    '''
-    cursor.execute(query)
-       # grab the column headers from the returned data
+
+    # use cursor to query the database for a list of products
+    cursor.execute('SELECT TypeName as label, TypeID as value FROM ProductType')
+
+    # grab the column headers from the returned data
     column_headers = [x[0] for x in cursor.description]
 
     # create an empty dictionary object to use in 
@@ -59,3 +55,4 @@ def get_most_pop_products():
         json_data.append(dict(zip(column_headers, row)))
 
     return jsonify(json_data)
+
